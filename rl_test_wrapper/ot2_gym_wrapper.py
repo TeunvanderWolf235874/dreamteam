@@ -5,12 +5,11 @@ from sim_class import Simulation
 
 class OT2Env(gym.Env):
     def __init__(self, render=False, max_steps=1000):
-        super(OT2Env, self).__init__()
-        self.render = False
+        super(OT2Env, self).__init__()        
         self.max_steps = max_steps
 
         # Create the simulation environment
-        self.sim = Simulation(num_agents=1)
+        self.sim = Simulation(num_agents=1, render=render)
 
         # Define action and observation space
         # They must be gym.spaces objects
