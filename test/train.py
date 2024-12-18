@@ -7,6 +7,7 @@ from wandb.integration.sb3 import WandbCallback
 import os
 
 import argparse
+import typing_extensions
 
 from clearml import Task
 
