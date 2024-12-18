@@ -69,14 +69,15 @@ for i in range(10):
     # Add the tb_log_name argument to log TensorBoard data to the correct folder
     model.learn(total_timesteps=timesteps, callback=wandb_callback, progress_bar=True, reset_num_timesteps=False, tb_log_name=f"runs/{run.id}")
 
-    # Get the current reward value (you can customize this logic to get the actual performance)
-    current_reward = model.get_reward()  # Or another function to evaluate the model's performance
+    # Compute and log the mean reward (or another performance metric)
+    # Here we log the mean reward across the training period (you can customize it as needed)
+    mean_reward = model.get_reward()  # Placeholder for actual reward logic
+    wandb.log({'mean_reward': mean_reward})  # Log to wandb
 
     # Check if the model has improved (higher reward)
-    if current_reward > best_reward:
-        best_reward = current_reward
+    if mean_reward > best_reward:
+        best_reward = mean_reward
         model.save(best_model_path)  # Save the best model
 
     # Save the model periodically to the models folder with the run id and the current timestep
     model.save(f"models/{run.id}/{timesteps * (i + 1)}")
-
