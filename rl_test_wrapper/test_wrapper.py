@@ -51,7 +51,6 @@ model = PPO('MlpPolicy', env, verbose=1,
 
 # Create WandB callback
 wandb_callback = WandbCallback(
-    model_save_freq=10000,  # Adjust how often to save during training (optional)
     model_save_path=f"models/{run.id}",
     verbose=2,
 )
