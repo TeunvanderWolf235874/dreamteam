@@ -51,13 +51,13 @@ model = PPO('MlpPolicy', env, verbose=1,
 
 # Create WandB callback
 wandb_callback = WandbCallback(
-    model_save_freq=1000,  # Adjust how often to save during training (optional)
+    model_save_freq=10000,  # Adjust how often to save during training (optional)
     model_save_path=f"models/{run.id}",
     verbose=2,
 )
 
 # Variable for how often to save the model
-timesteps = 10000
+timesteps = 100000
 
 # Initialize variables for tracking the best model
 best_reward = -float('inf')  # Start with a very low reward
