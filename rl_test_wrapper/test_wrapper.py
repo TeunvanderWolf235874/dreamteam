@@ -8,6 +8,8 @@ import os
 import argparse
 import typing_extensions
 from clearml import Task
+from stable_baselines3.common.callbacks import BaseCallback
+
 
 # Replace Pendulum-v1/YourName with your own project name (Folder/YourName, e.g. 2022-Y2B-RoboSuite/Michael)
 task = Task.init(project_name='Mentor Group A/Group 1/Teun', # NB: Replace YourName with your own name
