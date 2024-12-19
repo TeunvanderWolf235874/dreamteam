@@ -2,6 +2,8 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 from sim_class import Simulation
+from stable_baselines3.common.callbacks import BaseCallback
+
 
 class OT2Env(gym.Env):
     def __init__(self, render=False, max_steps=1000):
