@@ -173,7 +173,7 @@ wandb_callback_handler = WandbCallback(
 
 # Run the PPO model training
 print("Starting training process")
-total_training_steps = 1000000  # Modify as needed for experimentation
+total_training_steps = 2000000  # Modify as needed for experimentation
 ppo_model.learn(
     total_timesteps=total_training_steps,
     callback=[wandb_callback_handler, training_metrics_logger, periodic_model_saver],

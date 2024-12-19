@@ -124,6 +124,13 @@ class OT2Env(gym.Env):
             if current_distance < self.previous_distance:  # Distance improved
                 reward += 10  # Bonus for improving distance
 
+        # Check if the task is completed
+        if current_distance < 0.001:  # Threshold for task completion
+            terminated = True
+            reward += 500  # Bonus for completing the task
+        else:
+            terminated = False        
+
         # Update the previous distance for the next step
         self.previous_distance = current_distance
 
