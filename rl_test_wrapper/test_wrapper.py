@@ -57,7 +57,7 @@ wandb_callback = WandbCallback(
 )
 
 # Variable for how often to save the model
-timesteps = 100000
+timesteps = 10000
 
 # Initialize variables for tracking the best model
 best_reward = -float('inf')  # Start with a very low reward
