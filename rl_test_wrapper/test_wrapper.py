@@ -40,7 +40,7 @@ args = parameter_parser.parse_args()
 os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
 
 # Initialize WandB project
-run = wandb.init(project="rl_test_wrapper", sync_tensorboard=True)
+run = wandb.init(project="rl_batch_size", sync_tensorboard=True)
 
 # Log the hyperparameters to WandB
 wandb.config.update(vars(arguments))  # This will log the arguments to the WandB config
