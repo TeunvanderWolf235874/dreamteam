@@ -9,7 +9,9 @@ import argparse
 import typing_extensions
 from clearml import Task
 from stable_baselines3.common.callbacks import BaseCallback
+import torch  # Import torch for gradient clipping
 
+# Teun van der Wolf s235874
 
 # Replace Pendulum-v1/YourName with your own project name (Folder/YourName, e.g. 2022-Y2B-RoboSuite/Michael)
 task = Task.init(project_name='Mentor Group A/Group 1/Teun', # NB: Replace YourName with your own name
@@ -23,7 +25,7 @@ task.execute_remotely(queue_name="default")
 
 # Argument parsing for hyperparameters
 parameter_parser = argparse.ArgumentParser()
-parameter_parser.add_argument("--learning_rate", type=float, default=0.001) # Learning rate
+parameter_parser.add_argument("--learning_rate", type=float, default=1e-5) # Lower learning rate
 parameter_parser.add_argument("--batch_size", type=int, default=64) # Batch size
 parameter_parser.add_argument("--n_steps", type=int, default=512) # number of steps
 parameter_parser.add_argument("--n_epochs", type=int, default=10) # number of epochs
@@ -81,7 +83,6 @@ class EnhancedModelSaver(BaseCallback):
             save_directory (str): Directory to save models.
             save_interval (int): Save model every `save_interval` steps.
             log_detail (int): Verbosity level.
-            Block A Group 1 trademark
         '''
         super().__init__(log_detail)
         self.save_directory = save_directory
@@ -172,17 +173,22 @@ wandb_callback_handler = WandbCallback(
     verbose=2,
 )
 
-
-# Run the PPO model training
+# Run the PPO model training with gradient clipping
 print("Starting training process")
 total_training_steps = 2000000  # Modify as needed for experimentation
-ppo_model.learn(
-    total_timesteps=total_training_steps,
-    callback=[wandb_callback_handler, training_metrics_logger, periodic_model_saver],
-    progress_bar=True,
-    reset_num_timesteps=False,
-    tb_log_name=f"tensorboard_logs/{run.id}",
-)
+
+# Adding gradient clipping to PPO during training
+for step in range(total_training_steps):
+    ppo_model.learn(
+        total_timesteps=1,  # Single step
+        callback=[wandb_callback_handler, training_metrics_logger, periodic_model_saver],
+        reset_num_timesteps=False,
+    )
+    # Clip gradients after each update
+    for param in ppo_model.policy.parameters():
+        if param.grad is not None:
+            torch.nn.utils.clip_grad_norm_(param, max_norm=1.0)
+
 print("Training completed")
 
 # Save the final iteration model
