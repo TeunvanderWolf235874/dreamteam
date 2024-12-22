@@ -118,37 +118,32 @@ class OT2Env(gym.Env):
         # Calculate the distance between the pipette position and the goal position
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
-        # Initialize reward
-        reward = 0.0
+        # Reward system
+        reward = 0
+        if hasattr(self, 'previous_distance'):
+            # Give 10 points if the agent gets closer to the goal
+            if current_distance < self.previous_distance:
+                reward += 10
+            else:
+                reward -= 1  # Small penalty for not improving
 
-        # Reward based on accuracy (negative distance as the main term)
-        reward += -current_distance * 100  # The closer the pipette is, the higher the reward (scaled by 100)
-
-        # Milestone rewards for crossing thresholds (encourages the agent to move closer to the goal)
-        milestones = [0.1, 0.05, 0.01]  # Define milestone distances
-        for milestone in milestones:
-            if self.previous_distance >= milestone > current_distance:
-                reward += 50  # Bonus for crossing a milestone
-
-        # Task completion bonus
-        if current_distance < 0.001:  # Threshold for task completion
-            reward += 1000  # Large bonus for achieving the goal
+        # Give 100 points if within 0.01 distance to the goal
+        if current_distance < 0.01:
+            reward += 100
             terminated = True
         else:
             terminated = False
 
-        # Penalize increasing distance (ensure agent doesn't drift away)
-        if hasattr(self, 'previous_distance') and current_distance > self.previous_distance:
-            reward -= 10  # Small penalty for moving away from the goal
-
-        # Update the previous distance for the next step
-        self.previous_distance = current_distance
-
-        # Initialize the truncated flag
+        # Penalize if steps exceed max steps
         if self.steps >= self.max_steps:
+            reward -= 10  # Penalty for exceeding max steps
+            terminated = True
             truncated = True
         else:
             truncated = False
+
+        # Update the previous distance for the next step
+        self.previous_distance = current_distance
 
         # Increment the step counter
         self.steps += 1
