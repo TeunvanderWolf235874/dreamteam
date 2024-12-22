@@ -118,31 +118,34 @@ class OT2Env(gym.Env):
         # Calculate the distance between the pipette position and the goal position
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
-        # Calculate the reward
-        reward = -current_distance
+        # Initialize reward
+        reward = 0.0
 
-        # Check if distance improved compared to the last step
-        if hasattr(self, 'previous_distance'):  # Ensure the attribute exists
-            if current_distance < self.previous_distance:  # Distance improved
-                reward += 10  # Bonus for improving distance
+        # Reward based on accuracy (negative distance as the main term)
+        reward += -current_distance * 100  # The closer the pipette is, the higher the reward (scaled by 100)
 
-        # Check if the task is completed
+        # Milestone rewards for crossing thresholds (encourages the agent to move closer to the goal)
+        milestones = [0.1, 0.05, 0.01]  # Define milestone distances
+        for milestone in milestones:
+            if self.previous_distance >= milestone > current_distance:
+                reward += 50  # Bonus for crossing a milestone
+
+        # Task completion bonus
         if current_distance < 0.001:  # Threshold for task completion
+            reward += 1000  # Large bonus for achieving the goal
             terminated = True
-            reward += 500  # Bonus for completing the task
         else:
-            terminated = False        
+            terminated = False
+
+        # Penalize increasing distance (ensure agent doesn't drift away)
+        if hasattr(self, 'previous_distance') and current_distance > self.previous_distance:
+            reward -= 10  # Small penalty for moving away from the goal
 
         # Update the previous distance for the next step
         self.previous_distance = current_distance
 
-        # Initialize the termination flag
-        terminated = False
-        
-        # Check if the episode should be truncated due to step limit
+        # Initialize the truncated flag
         if self.steps >= self.max_steps:
-            reward -= 10  # Penalty for exceeding the step limit
-            terminated = True  # Force termination
             truncated = True
         else:
             truncated = False
@@ -153,7 +156,6 @@ class OT2Env(gym.Env):
         # Return the updated observation, reward, and episode state
         info = {}
         return observation, float(reward), terminated, truncated, info
-
 
     def render(self, mode='human'):
         pass
