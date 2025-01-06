@@ -63,9 +63,9 @@ class OT2Env(gym.Env):
 
         # Reset additional environment variables
         self.steps = 0
-        self.reward = 0  # Initialize reward
-        self.previous_distance = None  # Reset previous distance
-        
+        self.cumulative_reward = 0  # Initialize cumulative reward for the entire episode
+        self.previous_distance = np.linalg.norm(self.initial_position - self.goal_position)  # Initialize distance
+
         # Set the start position in the simulation
         x, y, z = self.initial_position
         self.sim.set_start_position(x, y, z)
@@ -102,11 +102,8 @@ class OT2Env(gym.Env):
         # Calculate the distance between the pipette position and the goal position
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
-        # Update `self.previous_distance` if it hasn't been set yet
-        if self.previous_distance is None:
-            self.previous_distance = np.linalg.norm(self.initial_position - self.goal_position)
-
-        # Reward system        
+        # Step-specific reward
+        reward = 0
         if current_distance < self.previous_distance:
             reward += 10  # Reward for moving closer
         else:
@@ -130,11 +127,14 @@ class OT2Env(gym.Env):
         else:
             truncated = False
 
+        # Update cumulative reward
+        self.cumulative_reward += reward
+
         # Increment the step counter
         self.steps += 1
 
         # Return the updated observation, reward, and episode state
-        info = {}
+        info = {"cumulative_reward": self.cumulative_reward}  # Include cumulative reward in info
         return observation, float(reward), terminated, truncated, info
 
     def render(self, mode='human'):
