@@ -14,16 +14,6 @@ class OT2Env(gym.Env):
         self.sim = Simulation(num_agents=1, render=render)
 
         # Define action and observation space
-        # They must be gym.spaces objects
-
-        # Action space has to be -1 till 1
-        # Observational space can be any value in the 6 value array
-        # lr 0.001 and go up and down
-        # Freeze parameters when they reach an optimal value    
-        # Reward function is a hyper parameter: how fast does it reach the optimal point. 
-        # bREADCRUM reawrd. olnly get a reward when you actively move into the directions you have to be moving
-
-      
         self.action_space = spaces.Box(
             low=-1.0, 
             high=1.0, 
@@ -32,22 +22,18 @@ class OT2Env(gym.Env):
         )
 
         # Define the lower and upper bounds for the observation space
-        low = -np.inf * np.ones(6, dtype=np.float32)  # [-inf, -inf, -inf, -inf, -inf, -inf]
-        high = np.inf * np.ones(6, dtype=np.float32)  # [ inf,  inf,  inf,  inf,  inf,  inf]
+        low = -np.inf * np.ones(6, dtype=np.float32)
+        high = np.inf * np.ones(6, dtype=np.float32)
 
         # Define the shape and dtype
-        shape = (6,)  # 6 values: pipette_x, pipette_y, pipette_z, goal_x, goal_y, goal_z
-        dtype = np.float32
-        self.observation_space = spaces.Box(low=low, high=high, shape=shape, dtype=dtype)
+        self.observation_space = spaces.Box(low=low, high=high, shape=(6,), dtype=np.float32)
 
-        # keep track of the number of steps
+        # Keep track of the number of steps
         self.steps = 0
-        
 
     def reset(self, seed=None):
         if seed is not None:
             np.random.seed(seed)
-        
 
         # Define bounds for random position within the envelope
         low = np.array([-0.187, -0.1705, 0.1687], dtype=np.float32)
@@ -77,11 +63,10 @@ class OT2Env(gym.Env):
 
         # Reset additional environment variables
         self.steps = 0
-        self.min_error = float('inf')  # Minimum error starts at infinity
-        self.previous_distance = np.linalg.norm(self.initial_position - self.goal_position) # Initialize distance
- 
+        self.reward = 0  # Initialize reward
+        self.previous_distance = None  # Reset previous distance
+        
         # Set the start position in the simulation
-        # Set the start position in the simulation (pass x, y, z separately)
         x, y, z = self.initial_position
         self.sim.set_start_position(x, y, z)
 
@@ -89,7 +74,6 @@ class OT2Env(gym.Env):
         info = {}
 
         return observation, info
-
 
     def step(self, action):
         # Ensure the action is properly formatted
@@ -118,14 +102,18 @@ class OT2Env(gym.Env):
         # Calculate the distance between the pipette position and the goal position
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
-        # Reward system
-        reward = 0
-        if hasattr(self, 'previous_distance'):
-            # Give 10 points if the agent gets closer to the goal
-            if current_distance < self.previous_distance:
-                reward += 10
-            else:
-                reward -= 1  # Small penalty for not improving
+        # Update `self.previous_distance` if it hasn't been set yet
+        if self.previous_distance is None:
+            self.previous_distance = np.linalg.norm(self.initial_position - self.goal_position)
+
+        # Reward system        
+        if current_distance < self.previous_distance:
+            reward += 10  # Reward for moving closer
+        else:
+            reward -= 1  # Penalty for moving further away
+
+        # Update the previous distance
+        self.previous_distance = current_distance
 
         # Give 100 points if within 0.01 distance to the goal
         if current_distance < 0.01:
@@ -142,9 +130,6 @@ class OT2Env(gym.Env):
         else:
             truncated = False
 
-        # Update the previous distance for the next step
-        self.previous_distance = current_distance
-
         # Increment the step counter
         self.steps += 1
 
@@ -157,4 +142,3 @@ class OT2Env(gym.Env):
     
     def close(self):
         self.sim.close()
-
