@@ -1,5 +1,5 @@
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_6 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
