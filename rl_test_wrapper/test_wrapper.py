@@ -1,10 +1,12 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 from stable_baselines3.common.env_checker import check_env
 from ot2_gym_wrapper_simple_reward_exp_7 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
 from wandb.integration.sb3 import WandbCallback
-import os
 import argparse
 import typing_extensions
 from clearml import Task
