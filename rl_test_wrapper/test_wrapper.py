@@ -1,5 +1,5 @@
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_6 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_7 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
@@ -9,7 +9,7 @@ import argparse
 import typing_extensions
 from clearml import Task
 from stable_baselines3.common.callbacks import BaseCallback
-import torch  # Import torch for gradient clipping
+import torch  
 
 # Teun van der Wolf s235874
 

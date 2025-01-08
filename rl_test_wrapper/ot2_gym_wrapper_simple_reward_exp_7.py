@@ -103,25 +103,25 @@ class OT2Env(gym.Env):
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
         # Step-specific reward
-        reward = 0
+        reward = -1  # Penalize each step by -1
         if current_distance < self.previous_distance:
-            reward += 10  # Reward for moving closer
+            reward += 5  # Reward for moving closer
         else:
-            reward -= 1  # Penalty for moving further away
+            reward -= 10  # Penalty for moving further away
 
         # Update the previous distance
         self.previous_distance = current_distance
 
-        # Give 100 points if within 0.01 distance to the goal
-        if current_distance < 0.01:
-            reward += 100
+        # Give 100 points if within 0.001 distance to the goal
+        if current_distance < 0.001:
+            reward += 2000
             terminated = True
         else:
             terminated = False
 
         # Penalize if steps exceed max steps
         if self.steps >= self.max_steps:
-            reward -= 10  # Penalty for exceeding max steps
+            reward -= 100  # Penalty for exceeding max steps
             terminated = True
             truncated = True
         else:
@@ -136,6 +136,7 @@ class OT2Env(gym.Env):
         # Return the updated observation, reward, and episode state
         info = {"cumulative_reward": self.cumulative_reward}  # Include cumulative reward in info
         return observation, float(reward), terminated, truncated, info
+
 
     def render(self, mode='human'):
         pass
