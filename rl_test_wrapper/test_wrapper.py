@@ -2,7 +2,7 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_8 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_7 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
@@ -42,7 +42,7 @@ args = parameter_parser.parse_args()
 os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
 
 # Initialize WandB project
-run = wandb.init(project="rl_experiment_8", sync_tensorboard=True)
+run = wandb.init(project="rl_experiment_7", sync_tensorboard=True)
 
 # Log the hyperparameters to WandB
 wandb.config.update(vars(arguments))  # This will log the arguments to the WandB config
