@@ -104,6 +104,8 @@ class OT2Env(gym.Env):
 
         # Step-specific reward
         reward = -1  # Penalize each step by -1
+
+        # Reward for getting closer to the goal
         if current_distance < self.previous_distance:
             reward += 5  # Reward for moving closer
         else:
@@ -112,16 +114,20 @@ class OT2Env(gym.Env):
         # Update the previous distance
         self.previous_distance = current_distance
 
-        # Give 100 points if within 001 distance to the goal
+        # Smooth progress reward: exponential decay
+        reward_for_progress = np.exp(-current_distance)  # Exponentially decaying reward based on proximity
+        reward += reward_for_progress
+
+        # Give a large bonus reward when the robot gets close to the goal
         if current_distance < 0.01:
-            reward += 2000
+            reward += min(2000, 2000 * (1 - (self.steps / self.max_steps)))  # Capped goal achievement reward
             terminated = True
         else:
             terminated = False
 
-        # Penalize if steps exceed max steps
+        # Penalize if steps exceed max steps (but with a decaying penalty)
         if self.steps >= self.max_steps:
-            reward -= 100  # Penalty for exceeding max steps
+            reward -= 0.1 * self.steps  # Gradual penalty for each additional step taken
             terminated = True
             truncated = True
         else:
