@@ -102,17 +102,21 @@ class OT2Env(gym.Env):
         # Calculate the distance between the pipette position and the goal position
         current_distance = np.linalg.norm(pipette_position - self.goal_position)
 
-        # Movement penalty: Normalize the reward based on movement distance
-        movement_distance = np.linalg.norm(pipette_position - self.previous_pipette_position)
-        movement_penalty = 0.1 * movement_distance  # Penalize more for larger movements
-        reward = -1 - movement_penalty  # Basic penalty for each step
+        # Step-specific reward
+        reward = -1  # Penalize each step by -1
 
-        # Smooth progress reward using an exponential decay function
+        # Reward for getting closer to the goal
+        if current_distance < self.previous_distance:
+            reward += 5  # Reward for moving closer
+        else:
+            reward -= 10  # Penalty for moving further away
+
+        # Update the previous distance
+        self.previous_distance = current_distance
+
+        # Smooth progress reward: exponential decay
         reward_for_progress = np.exp(-current_distance)  # Exponentially decaying reward based on proximity
         reward += reward_for_progress
-
-        # Update the previous pipette position
-        self.previous_pipette_position = pipette_position
 
         # Give a large bonus reward when the robot gets close to the goal
         if current_distance < 0.01:
