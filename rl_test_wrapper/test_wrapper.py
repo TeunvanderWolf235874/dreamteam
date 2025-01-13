@@ -2,7 +2,7 @@ import os
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_7 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_8 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
@@ -42,7 +42,7 @@ args = parameter_parser.parse_args()
 os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
 
 # Initialize WandB project
-run = wandb.init(project="rl_experiment_7", sync_tensorboard=True)
+run = wandb.init(project="rl_batch_size", sync_tensorboard=True)
 
 # Log the hyperparameters to WandB
 wandb.config.update(vars(arguments))  # This will log the arguments to the WandB config
@@ -176,23 +176,20 @@ wandb_callback_handler = WandbCallback(
 )
 
 # Run the PPO model training with gradient clipping
-print("Now starting training process")
+print("Starting training process")
+total_training_steps = 2000000  # Modify as needed for experimentation
 
-# Set total training steps
-total_training_steps = 2000000  # Adjust based on your experimental needs
-batch_training_steps = 10000    # Number of steps per training batch
-
-# Track progress using WandB and callbacks
-print("Starting batch training process")
-
-# Dynamic batch size training
-for step in range(0, total_training_steps, batch_training_steps):
+# Adding gradient clipping to PPO during training
+for step in range(total_training_steps):
     ppo_model.learn(
-        total_timesteps=batch_training_steps,
+        total_timesteps=1,  # Single step
         callback=[wandb_callback_handler, training_metrics_logger, periodic_model_saver],
         reset_num_timesteps=False,
     )
-    print(f"Completed {step + batch_training_steps} steps.")
+    # Clip gradients after each update
+    for param in ppo_model.policy.parameters():
+        if param.grad is not None:
+            torch.nn.utils.clip_grad_norm_(param, max_norm=1.0)
 
 print("Training completed")
 
