@@ -119,7 +119,7 @@ class OT2Env(gym.Env):
         reward += reward_for_progress
 
         # Give a large bonus reward when the robot gets close to the goal
-        if current_distance < 0.001:
+        if current_distance < 0.01:
             reward += min(2000, 2000 * (1 - (self.steps / self.max_steps)))  # Capped goal achievement reward
             terminated = True
         else:
