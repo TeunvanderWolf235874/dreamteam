@@ -1,6 +1,6 @@
 import optuna
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_10 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_9 import OT2Env
 from stable_baselines3 import PPO
 from wandb.integration.sb3 import WandbCallback
 from clearml import Task
@@ -8,7 +8,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 import torch
 import numpy as np
 import os
-import wandb
+import wandb  # Ensure wandb is imported
 
 # Define your custom objective function for Optuna
 def objective(trial):
@@ -31,7 +31,7 @@ def objective(trial):
 
     # Initialize WandB project
     os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
-    run = wandb.init(project="rl_experiment_9", sync_tensorboard=True)
+    run = wandb.init(project="RL_Experiment_9", sync_tensorboard=True)
     wandb.config.update({
         'learning_rate': learning_rate,
         'batch_size': batch_size,
@@ -40,7 +40,7 @@ def objective(trial):
         'gamma': gamma,
         'vf_coef': vf_coef,
         'clip_range': clip_range
-    })
+    }, allow_val_change=True)  # Add this option to allow value change
 
     try:
         training_env = OT2Env(render=False)
