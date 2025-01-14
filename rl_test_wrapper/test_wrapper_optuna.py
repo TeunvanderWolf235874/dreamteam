@@ -1,6 +1,6 @@
 import optuna
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_9 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_10 import OT2Env
 from stable_baselines3 import PPO
 from wandb.integration.sb3 import WandbCallback
 from clearml import Task
@@ -8,7 +8,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 import torch
 import numpy as np
 import os
-import wandb  # Ensure wandb is imported
+import wandb  
 
 # Define your custom objective function for Optuna
 def objective(trial):
