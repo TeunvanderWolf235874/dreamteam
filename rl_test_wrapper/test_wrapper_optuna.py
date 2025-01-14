@@ -11,14 +11,13 @@ import os
 import wandb  
 
 # Define your custom objective function for Optuna
-def objective(trial):
-    # Suggest hyperparameters for optimization
-    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-3)
-    batch_size = trial.suggest_categorical('batch_size', [32, 64, 128, 256])
-    n_steps = trial.suggest_int('n_steps', 128, 2048)
-    n_epochs = trial.suggest_int('n_epochs', 1, 20)
-    gamma = trial.suggest_uniform('gamma', 0.9, 0.999)
-    vf_coef = trial.suggest_uniform('vf_coef', 0.1, 0.9)
+def objective(trial): # Suggest hyperparameters for optimization
+    learning_rate = trial.suggest_loguniform('learning_rate', 1e-5, 1e-3) 
+    batch_size = trial.suggest_categorical('batch_size', [16, 32, 64]) 
+    n_steps = trial.suggest_int('n_steps', 128, 1024) 
+    n_epochs = trial.suggest_int('n_epochs', 1, 20) 
+    gamma = trial.suggest_uniform('gamma', 0.9, 0.999) 
+    vf_coef = trial.suggest_uniform('vf_coef', 0.1, 0.9) 
     clip_range = trial.suggest_uniform('clip_range', 0.1, 0.4)
 
     # Initialize the ClearML task
