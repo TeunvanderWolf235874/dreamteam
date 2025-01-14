@@ -30,8 +30,8 @@ def objective(trial):
     task.execute_remotely(queue_name="default")
 
     # Initialize WandB project
-    os.environ['WANDB_API_KEY'] = 'YOUR_WANDB_API_KEY'
-    run = wandb.init(project="rl_batch_size_optimization", sync_tensorboard=True)
+    os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
+    run = wandb.init(project="rl_experiment_9", sync_tensorboard=True)
     wandb.config.update({
         'learning_rate': learning_rate,
         'batch_size': batch_size,
