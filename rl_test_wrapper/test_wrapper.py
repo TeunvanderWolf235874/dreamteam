@@ -1,8 +1,5 @@
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
 from stable_baselines3.common.env_checker import check_env
-from ot2_gym_wrapper_simple_reward_exp_8 import OT2Env
+from ot2_gym_wrapper_simple_reward_exp_9 import OT2Env
 from stable_baselines3 import PPO
 import time
 import wandb
@@ -29,7 +26,7 @@ task.execute_remotely(queue_name="default")
 parameter_parser = argparse.ArgumentParser()
 parameter_parser.add_argument("--learning_rate", type=float, default=1e-5) # Lower learning rate
 parameter_parser.add_argument("--batch_size", type=int, default=64) # Batch size
-parameter_parser.add_argument("--n_steps", type=int, default=512) # number of steps
+parameter_parser.add_argument("--n_steps", type=int, default=1500) # number of steps
 parameter_parser.add_argument("--n_epochs", type=int, default=10) # number of epochs
 parameter_parser.add_argument("--discount_factor", type=float, default=0.98)  # Gamma value
 parameter_parser.add_argument("--vf_coef", type=float, default=0.5)  # Value function coefficient
@@ -42,7 +39,7 @@ args = parameter_parser.parse_args()
 os.environ['WANDB_API_KEY'] = '17b671297e98466f9af4baa04230fcd84aec26c3'
 
 # Initialize WandB project
-run = wandb.init(project="rl_batch_size", sync_tensorboard=True)
+run = wandb.init(project="RL_Experiment_9", sync_tensorboard=True)
 
 # Log the hyperparameters to WandB
 wandb.config.update(vars(arguments))  # This will log the arguments to the WandB config
@@ -77,7 +74,7 @@ os.makedirs(model_storage_path, exist_ok=True)
 class EnhancedModelSaver(BaseCallback):
     '''A callback to save intermediate and best-performing models during training.'''
 
-    def __init__(self, save_directory, save_interval=50000, log_detail=0):
+    def __init__(self, save_directory, save_interval=10000, log_detail=0):
         '''
         Initialize the EnhancedModelSaver.
 
@@ -167,17 +164,17 @@ class MetricsLogger(BaseCallback):
         return True
 
 # Instantiate and combine callbacks
-periodic_model_saver = EnhancedModelSaver(save_directory=model_storage_path, save_interval=100000, log_detail=1)
+periodic_model_saver = EnhancedModelSaver(save_directory=model_storage_path, save_interval=10000, log_detail=1)
 training_metrics_logger = MetricsLogger()
 wandb_callback_handler = WandbCallback(
-    model_save_freq=2000,
+    model_save_freq=1000,
     model_save_path=model_storage_path,
     verbose=2,
 )
 
 # Run the PPO model training with gradient clipping
 print("Starting training process")
-total_training_steps = 2000000  # Modify as needed for experimentation
+total_training_steps = 200000  # Modify as needed for experimentation
 
 # Adding gradient clipping to PPO during training
 for step in range(total_training_steps):

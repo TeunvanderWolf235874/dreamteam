@@ -6,7 +6,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 
 class OT2Env(gym.Env):
-    def __init__(self, render=False, max_steps=1000):
+    def __init__(self, render=False, max_steps=1500):
         super(OT2Env, self).__init__()        
         self.max_steps = max_steps
 
